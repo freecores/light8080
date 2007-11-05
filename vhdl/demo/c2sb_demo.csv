@@ -1,0 +1,197 @@
+# Copyright (C) 1991-2006 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+
+# Quartus II Version 6.1 Build 201 11/27/2006 SJ Web Edition
+# File: C:\Documents and Settings\ja_rd\Escritorio\light8080\vhdl\demo\c2sb_demo.csv
+# Generated on: Sun Nov 04 23:24:25 2007
+
+# Note: The column header names should not be changed if you wish to import this .csv file into the Quartus II software.
+
+To,Direction,Location,I/O Bank,Vref Group,I/O Standard,Reserved,Group
+addr_out[15],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[14],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[13],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[12],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[11],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[10],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[9],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[8],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[7],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[6],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[5],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[4],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[3],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[2],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[1],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+addr_out[0],Output,,,,3.3-V LVTTL,,addr_out[15..0]
+clk,Input,PIN_L1,2,B2_N1,3.3-V LVTTL,,
+data_in[7],Input,,,,3.3-V LVTTL,,data_in[7..0]
+data_in[6],Input,,,,3.3-V LVTTL,,data_in[7..0]
+data_in[5],Input,,,,3.3-V LVTTL,,data_in[7..0]
+data_in[4],Input,,,,3.3-V LVTTL,,data_in[7..0]
+data_in[3],Input,,,,3.3-V LVTTL,,data_in[7..0]
+data_in[2],Input,,,,3.3-V LVTTL,,data_in[7..0]
+data_in[1],Input,,,,3.3-V LVTTL,,data_in[7..0]
+data_in[0],Input,,,,3.3-V LVTTL,,data_in[7..0]
+data_out[7],Output,,,,3.3-V LVTTL,,data_out[7..0]
+data_out[6],Output,,,,3.3-V LVTTL,,data_out[7..0]
+data_out[5],Output,,,,3.3-V LVTTL,,data_out[7..0]
+data_out[4],Output,,,,3.3-V LVTTL,,data_out[7..0]
+data_out[3],Output,,,,3.3-V LVTTL,,data_out[7..0]
+data_out[2],Output,,,,3.3-V LVTTL,,data_out[7..0]
+data_out[1],Output,,,,3.3-V LVTTL,,data_out[7..0]
+data_out[0],Output,,,,3.3-V LVTTL,,data_out[7..0]
+halt,Output,,,,3.3-V LVTTL,,
+inta,Output,,,,3.3-V LVTTL,,
+inte,Output,,,,3.3-V LVTTL,,
+intr,Input,,,,3.3-V LVTTL,,
+io,Output,,,,3.3-V LVTTL,,
+rd,Output,,,,3.3-V LVTTL,,
+reset,Input,,,,3.3-V LVTTL,,
+vma,Output,,,,3.3-V LVTTL,,
+wr,Output,,,,3.3-V LVTTL,,
+hex0[0],Unknown,PIN_J2,2,B2_N1,3.3-V LVTTL,,
+hex0[1],Unknown,PIN_J1,2,B2_N1,3.3-V LVTTL,,
+hex0[2],Unknown,PIN_H2,2,B2_N1,3.3-V LVTTL,,
+hex0[3],Unknown,PIN_H1,2,B2_N1,3.3-V LVTTL,,
+hex0[4],Unknown,PIN_F2,2,B2_N1,3.3-V LVTTL,,
+hex0[5],Unknown,PIN_F1,2,B2_N1,3.3-V LVTTL,,
+hex0[6],Unknown,PIN_E2,2,B2_N1,3.3-V LVTTL,,
+hex1[0],Unknown,PIN_E1,2,B2_N1,3.3-V LVTTL,,
+hex1[1],Unknown,PIN_H6,2,B2_N0,3.3-V LVTTL,,
+hex1[2],Unknown,PIN_H5,2,B2_N0,3.3-V LVTTL,,
+hex1[3],Unknown,PIN_H4,2,B2_N0,3.3-V LVTTL,,
+hex1[4],Unknown,PIN_G3,2,B2_N0,3.3-V LVTTL,,
+hex1[5],Unknown,PIN_D2,2,B2_N0,3.3-V LVTTL,,
+hex1[6],Unknown,PIN_D1,2,B2_N0,3.3-V LVTTL,,
+hex2[0],Unknown,PIN_G5,2,B2_N0,3.3-V LVTTL,,
+hex2[1],Unknown,PIN_G6,2,B2_N0,3.3-V LVTTL,,
+hex2[2],Unknown,PIN_C2,2,B2_N0,3.3-V LVTTL,,
+hex2[3],Unknown,PIN_C1,2,B2_N0,3.3-V LVTTL,,
+hex2[4],Unknown,PIN_E3,2,B2_N0,3.3-V LVTTL,,
+hex2[5],Unknown,PIN_E4,2,B2_N0,3.3-V LVTTL,,
+hex2[6],Unknown,PIN_D3,2,B2_N0,3.3-V LVTTL,,
+hex3[0],Unknown,PIN_F4,2,B2_N0,3.3-V LVTTL,,
+hex3[1],Unknown,PIN_D5,2,B2_N0,3.3-V LVTTL,,
+hex3[2],Unknown,PIN_D6,2,B2_N0,3.3-V LVTTL,,
+hex3[3],Unknown,PIN_J4,2,B2_N1,3.3-V LVTTL,,
+hex3[4],Unknown,PIN_L8,2,B2_N1,3.3-V LVTTL,,
+hex3[5],Unknown,PIN_F3,2,B2_N0,3.3-V LVTTL,,
+hex3[6],Unknown,PIN_D4,2,B2_N0,3.3-V LVTTL,,
+green_leds[0],Unknown,PIN_U22,6,B6_N1,3.3-V LVTTL,,
+green_leds[1],Unknown,PIN_U21,6,B6_N1,3.3-V LVTTL,,
+green_leds[2],Unknown,PIN_V22,6,B6_N1,3.3-V LVTTL,,
+green_leds[3],Unknown,PIN_V21,6,B6_N1,3.3-V LVTTL,,
+green_leds[4],Unknown,PIN_W22,6,B6_N1,3.3-V LVTTL,,
+green_leds[5],Unknown,PIN_W21,6,B6_N1,3.3-V LVTTL,,
+green_leds[6],Unknown,PIN_Y22,6,B6_N1,3.3-V LVTTL,,
+green_leds[7],Unknown,PIN_Y21,6,B6_N1,3.3-V LVTTL,,
+flash_addr[0],Unknown,PIN_AB20,7,B7_N0,3.3-V LVTTL,,
+flash_addr[1],Unknown,PIN_AA14,7,B7_N1,3.3-V LVTTL,,
+flash_addr[2],Unknown,PIN_Y16,7,B7_N0,3.3-V LVTTL,,
+flash_addr[3],Unknown,PIN_R15,7,B7_N0,3.3-V LVTTL,,
+flash_addr[4],Unknown,PIN_T15,7,B7_N0,3.3-V LVTTL,,
+flash_addr[5],Unknown,PIN_U15,7,B7_N0,3.3-V LVTTL,,
+flash_addr[6],Unknown,PIN_V15,7,B7_N0,3.3-V LVTTL,,
+flash_addr[7],Unknown,PIN_W15,7,B7_N0,3.3-V LVTTL,,
+flash_addr[8],Unknown,PIN_R14,7,B7_N0,3.3-V LVTTL,,
+flash_addr[9],Unknown,PIN_Y13,7,B7_N1,3.3-V LVTTL,,
+flash_addr[10],Unknown,PIN_R12,7,B7_N1,3.3-V LVTTL,,
+flash_addr[11],Unknown,PIN_T12,7,B7_N1,3.3-V LVTTL,,
+flash_addr[12],Unknown,PIN_AB14,7,B7_N1,3.3-V LVTTL,,
+flash_addr[13],Unknown,PIN_AA13,7,B7_N1,3.3-V LVTTL,,
+flash_addr[14],Unknown,PIN_AB13,7,B7_N1,3.3-V LVTTL,,
+flash_addr[15],Unknown,PIN_AA12,7,B7_N1,3.3-V LVTTL,,
+flash_addr[16],Unknown,PIN_AB12,7,B7_N1,3.3-V LVTTL,,
+flash_addr[17],Unknown,PIN_AA20,7,B7_N0,3.3-V LVTTL,,
+flash_addr[18],Unknown,PIN_U14,7,B7_N0,3.3-V LVTTL,,
+flash_addr[19],Unknown,PIN_V14,7,B7_N1,3.3-V LVTTL,,
+flash_addr[20],Unknown,PIN_U13,7,B7_N1,3.3-V LVTTL,,
+flash_addr[21],Unknown,PIN_R13,7,B7_N0,3.3-V LVTTL,,
+flash_data[0],Unknown,PIN_AB16,7,B7_N1,3.3-V LVTTL,,
+flash_data[1],Unknown,PIN_AA16,7,B7_N1,3.3-V LVTTL,,
+flash_data[2],Unknown,PIN_AB17,7,B7_N1,3.3-V LVTTL,,
+flash_data[3],Unknown,PIN_AA17,7,B7_N1,3.3-V LVTTL,,
+flash_data[4],Unknown,PIN_AB18,7,B7_N0,3.3-V LVTTL,,
+flash_data[5],Unknown,PIN_AA18,7,B7_N0,3.3-V LVTTL,,
+flash_data[6],Unknown,PIN_AB19,7,B7_N0,3.3-V LVTTL,,
+flash_data[7],Unknown,PIN_AA19,7,B7_N0,3.3-V LVTTL,,
+flash_oe,Unknown,PIN_AA15,7,B7_N1,3.3-V LVTTL,,
+flash_reset,Unknown,PIN_W14,7,B7_N1,3.3-V LVTTL,,
+flash_we,Unknown,PIN_Y14,7,B7_N0,3.3-V LVTTL,,
+switches[0],Unknown,PIN_L22,5,B5_N1,3.3-V LVTTL,,
+switches[1],Unknown,PIN_L21,5,B5_N1,3.3-V LVTTL,,
+switches[2],Unknown,PIN_M22,6,B6_N0,3.3-V LVTTL,,
+switches[3],Unknown,PIN_V12,7,B7_N1,3.3-V LVTTL,,
+switches[4],Unknown,PIN_W12,7,B7_N1,3.3-V LVTTL,,
+switches[5],Unknown,PIN_U12,8,B8_N0,3.3-V LVTTL,,
+switches[6],Unknown,PIN_U11,8,B8_N0,3.3-V LVTTL,,
+switches[7],Unknown,PIN_M2,1,B1_N0,3.3-V LVTTL,,
+switches[8],Unknown,PIN_M1,1,B1_N0,3.3-V LVTTL,,
+switches[9],Unknown,PIN_L2,2,B2_N1,3.3-V LVTTL,,
+buttons[0],Unknown,PIN_R22,6,B6_N0,3.3-V LVTTL,,
+buttons[1],Unknown,PIN_R21,6,B6_N0,3.3-V LVTTL,,
+buttons[2],Unknown,PIN_T22,6,B6_N0,3.3-V LVTTL,,
+buttons[3],Unknown,PIN_T21,6,B6_N0,3.3-V LVTTL,,
+red_leds[0],Unknown,PIN_R20,6,B6_N0,3.3-V LVTTL,,
+red_leds[1],Unknown,PIN_R19,6,B6_N0,3.3-V LVTTL,,
+red_leds[2],Unknown,PIN_U19,6,B6_N1,3.3-V LVTTL,,
+red_leds[3],Unknown,PIN_Y19,6,B6_N1,3.3-V LVTTL,,
+red_leds[4],Unknown,PIN_T18,6,B6_N1,3.3-V LVTTL,,
+red_leds[5],Unknown,PIN_V19,6,B6_N1,3.3-V LVTTL,,
+red_leds[6],Unknown,PIN_Y18,6,B6_N1,3.3-V LVTTL,,
+red_leds[7],Unknown,PIN_U18,6,B6_N1,3.3-V LVTTL,,
+red_leds[8],Unknown,PIN_R18,6,B6_N0,3.3-V LVTTL,,
+red_leds[9],Unknown,PIN_R17,6,B6_N1,3.3-V LVTTL,,
+rxd,Unknown,PIN_F14,4,B4_N1,3.3-V LVTTL,,
+txd,Unknown,PIN_G12,4,B4_N1,3.3-V LVTTL,,
+sram_addr[0],Unknown,PIN_AA3,8,B8_N1,3.3-V LVTTL,,
+sram_addr[1],Unknown,PIN_AB3,8,B8_N1,3.3-V LVTTL,,
+sram_addr[2],Unknown,PIN_AA4,8,B8_N1,3.3-V LVTTL,,
+sram_addr[3],Unknown,PIN_AB4,8,B8_N1,3.3-V LVTTL,,
+sram_addr[4],Unknown,PIN_AA5,8,B8_N1,3.3-V LVTTL,,
+sram_addr[5],Unknown,PIN_AB10,8,B8_N0,3.3-V LVTTL,,
+sram_addr[6],Unknown,PIN_AA11,8,B8_N0,3.3-V LVTTL,,
+sram_addr[7],Unknown,PIN_AB11,8,B8_N0,3.3-V LVTTL,,
+sram_addr[8],Unknown,PIN_V11,8,B8_N0,3.3-V LVTTL,,
+sram_addr[9],Unknown,PIN_W11,8,B8_N0,3.3-V LVTTL,,
+sram_addr[10],Unknown,PIN_R11,8,B8_N0,3.3-V LVTTL,,
+sram_addr[11],Unknown,PIN_T11,8,B8_N0,3.3-V LVTTL,,
+sram_addr[12],Unknown,PIN_Y10,8,B8_N0,3.3-V LVTTL,,
+sram_addr[13],Unknown,PIN_U10,8,B8_N0,3.3-V LVTTL,,
+sram_addr[14],Unknown,PIN_R10,8,B8_N0,3.3-V LVTTL,,
+sram_addr[15],Unknown,PIN_T7,8,B8_N1,3.3-V LVTTL,,
+sram_addr[16],Unknown,PIN_Y6,8,B8_N1,3.3-V LVTTL,,
+sram_addr[17],Unknown,PIN_Y5,8,B8_N1,3.3-V LVTTL,,
+sram_data[0],Unknown,PIN_AA6,8,B8_N1,3.3-V LVTTL,,
+sram_data[1],Unknown,PIN_AB6,8,B8_N1,3.3-V LVTTL,,
+sram_data[2],Unknown,PIN_AA7,8,B8_N1,3.3-V LVTTL,,
+sram_data[3],Unknown,PIN_AB7,8,B8_N1,3.3-V LVTTL,,
+sram_data[4],Unknown,PIN_AA8,8,B8_N0,3.3-V LVTTL,,
+sram_data[5],Unknown,PIN_AB8,8,B8_N0,3.3-V LVTTL,,
+sram_data[6],Unknown,PIN_AA9,8,B8_N0,3.3-V LVTTL,,
+sram_data[7],Unknown,PIN_AB9,8,B8_N0,3.3-V LVTTL,,
+sram_data[8],Unknown,PIN_Y9,8,B8_N0,3.3-V LVTTL,,
+sram_data[9],Unknown,PIN_W9,8,B8_N0,3.3-V LVTTL,,
+sram_data[10],Unknown,PIN_V9,8,B8_N1,3.3-V LVTTL,,
+sram_data[11],Unknown,PIN_U9,8,B8_N0,3.3-V LVTTL,,
+sram_data[12],Unknown,PIN_R9,8,B8_N0,3.3-V LVTTL,,
+sram_data[13],Unknown,PIN_W8,8,B8_N1,3.3-V LVTTL,,
+sram_data[14],Unknown,PIN_V8,8,B8_N1,3.3-V LVTTL,,
+sram_data[15],Unknown,PIN_U8,8,B8_N1,3.3-V LVTTL,,
+sram_ce_n,Unknown,PIN_AB5,8,B8_N1,3.3-V LVTTL,,
+sram_we_n,Unknown,PIN_AA10,8,B8_N0,3.3-V LVTTL,,
+sram_ub_n,Unknown,PIN_W7,8,B8_N1,3.3-V LVTTL,,
+sram_lb_n,Unknown,PIN_Y7,8,B8_N1,3.3-V LVTTL,,
+sram_oe_n,Unknown,PIN_T8,8,B8_N1,3.3-V LVTTL,,
