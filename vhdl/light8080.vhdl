@@ -58,18 +58,23 @@ end light8080;
 --
 -- Signal reset needs to be active for 1 clock cycle (i.e. it is sampled on a 
 -- positive clock edge and is subject to setup and hold times). 
--- Once reset is deasserted, the first fetch at address 0x0000 will happen N
+-- Once reset is deasserted, the first fetch at address 0x0000 will happen 4
 -- cycles later.
 --
 -- Signal intr is sampled on all positive clock edges. If asserted when inte is
--- high, a fetch cycle will occur with inta signal active. During this fetch, PC
--- will not be incremented. After the fetch, the opcode will be executed, inta 
--- will be deasserted and normal execution will be resumed. 
+-- high, interrupts will be disabled, inta will be asserted high and a fetch 
+-- cycle will occur. The fetched instruction will be executed normally, except 
+-- PC will not be valid in any subsequent fetch cycles of the same instruction, 
+-- and will not be incremented.
+-- inta will remain high for the duration of the fetched instruction (in the 
+-- original 8080 it was high only for the opcode fetch cycle). 
+-- PC will not be incremented while inta is high, but it can be explicitly 
+-- modified (e.g. RTS, CALL, etc.).
 -- Interrupts will be disabled upon assertion of inta, and remain disabled 
--- until exeplicitly enabled by the program (as in the original).
+-- until explicitly enabled by the program (as in the original).
 --
--- As a consequence of the above, only single-byte instructions should be
--- supplied in inta cycles. See the design notes.
+-- The above means that any instruction can be supplied in an inta cycle, 
+-- single byte or multibyte. See the design notes.
 --##############################################################################
 
 architecture microcoded of light8080 is
