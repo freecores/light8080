@@ -66,8 +66,8 @@
 __reset 
 
 NOP           ; NOP                     
-NOP           ; _pl = AND			;									// T1 & T2 = 0x00
-NOP           ; _ph = AND     ;									// T1 & T2 = 0x00
+NOP           ; _pl = AND			;								  // T1 & T2 = 0x00
+NOP           ; _ph = AND     ;								  // T1 & T2 = 0x00
 
 // FETCH ucode: from 3 to 6 
 // (executed in INTA cycles too, with pc increment inhibited to preserve PC)
@@ -367,7 +367,7 @@ __code  "00110100"
 __asm   INR M
 
 JSR read_m
-NOP           ; DO = ADC      ; #auxcy, #fp_r
+NOP           ; DO = ADC      ; #auxcy, #setacy, #fp_r
 JSR write_m
 
 
