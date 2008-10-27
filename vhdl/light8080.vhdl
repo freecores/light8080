@@ -1,8 +1,12 @@
 --##############################################################################
--- light8080 core
+-- light8080 : Intel 8080 binary compatible core
 --##############################################################################
--- v1.0    (05 nov 2007) Jose A. Ruiz
--- This file and all the light8080 project is freeware (See COPYING.TXT)
+-- v1.1    (20 sep 2008) Microcode bug in INR fixed.
+-- v1.0    (05 nov 2007) First release. Jose A. Ruiz.
+--
+-- This file and all the light8080 project are freeware (See COPYING.TXT)
+--##############################################################################
+-- -- (More comprehensive explainations can be found in the design notes)
 --##############################################################################
 
 library IEEE;
@@ -47,17 +51,21 @@ entity light8080 is
 end light8080;
 
 --##############################################################################
--- All memory and io accesses are synchronous. Signal vma works as the master
--- memory and io synchronous enable. More specifically:
+-- All memory and io accesses are synchronous (rising clock edge). Signal vma 
+-- works as the master memory and io synchronous enable. More specifically:
 --
 --    * All memory/io control signals (io,rd,wr) are valid only when vma is 
 --      high. They never activate when vms is inactive. 
 --    * Signals data_out and address are only valid when vma='1'. The high 
---      address byte is 0x00 fir all io accesses.
---    * Signal data_in should be valid by the end of the cycle after vma='1'.
+--      address byte is 0x00 for all io accesses.
+--    * Signal data_in should be valid by the end of the cycle after vma='1', 
+--      data is clocked in by the rising clock edge.
 --
--- Signal reset needs to be active for 1 clock cycle (i.e. it is sampled on a 
--- positive clock edge and is subject to setup and hold times). 
+-- All signals are assumed to be synchronous to the master clock. Prevention of
+-- metastability, if necessary, is up to you.
+-- 
+-- Signal reset needs to be active for just 1 clock cycle (it is sampled on a 
+-- positive clock edge and is subject to setup and hold times).
 -- Once reset is deasserted, the first fetch at address 0x0000 will happen 4
 -- cycles later.
 --
@@ -65,16 +73,16 @@ end light8080;
 -- high, interrupts will be disabled, inta will be asserted high and a fetch 
 -- cycle will occur. The fetched instruction will be executed normally, except 
 -- PC will not be valid in any subsequent fetch cycles of the same instruction, 
--- and will not be incremented.
+-- and will not be incremented (In practice, the same as the original 8080).
 -- inta will remain high for the duration of the fetched instruction (in the 
 -- original 8080 it was high only for the opcode fetch cycle). 
--- PC will not be incremented while inta is high, but it can be explicitly 
--- modified (e.g. RTS, CALL, etc.).
+-- PC will not be autoincremented while inta is high, but it can be explicitly 
+-- modified (e.g. RTS, CALL, etc.). Again, the same as the original.
 -- Interrupts will be disabled upon assertion of inta, and remain disabled 
 -- until explicitly enabled by the program (as in the original).
 --
 -- The above means that any instruction can be supplied in an inta cycle, 
--- single byte or multibyte. See the design notes.
+-- either single byte or multibyte. See the design notes.
 --##############################################################################
 
 architecture microcoded of light8080 is
