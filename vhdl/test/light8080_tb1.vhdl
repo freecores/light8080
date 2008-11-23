@@ -2,7 +2,7 @@
 -- Light8080 simulation test bench 1 : Interrupt response test
 --------------------------------------------------------------------------------
 -- Source for the 8080 program is in asm\tb1.asm
--- Upon completion, a value of 055h in ACC means success and a 0aah means
+-- Upon completion, a value of 033h in ACC means success and a 0aah means
 -- failure, but the proper behavior of intr/inta/halt has to be verified
 -- visually.
 --------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ X"c6",X"01",X"c6",X"01",X"fb",X"76",X"fe",X"11",
 X"c2",X"7b",X"00",X"78",X"fe",X"00",X"c2",X"7b",
 X"00",X"79",X"fe",X"0c",X"c2",X"7b",X"00",X"7a",
 X"fe",X"12",X"7b",X"fe",X"34",X"c2",X"7b",X"00",
-X"3e",X"55",X"76",X"3e",X"aa",X"76",X"00",X"00",
+X"3e",X"33",X"76",X"3e",X"aa",X"76",X"00",X"00",
 X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00",
 X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00",
 X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00",
@@ -334,11 +334,14 @@ X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00"
 );
 
 
-
 type t_int_vectors is array(0 to 15) of std_logic_vector(7 downto 0);
 
+-- This ROM holds the int vectors that will be fed to the CPU along the test. 
+-- It will be read like a progrm ROM except a special pointer (vector_counter) 
+-- will be used instead of the PC (see below).
+-- Of course this is a simulation trick not meant to be synthesized.
 signal int_vectors : t_int_vectors := (
-  X"00",                -- not used
+  X"00",                -- not used (see below)
   X"e7",                -- rst 4 (rst 20h)
   X"4f",                -- mov c,a 
   X"11", X"34", X"12",  -- lxi d, 1234h
@@ -347,7 +350,10 @@ signal int_vectors : t_int_vectors := (
   X"00", X"00", X"00", X"00", X"00", X"00", X"00", X"00"
 );
 
+-- This will be used to read the irq vector ROM. It's a pointer that increments 
+-- whenever the CPU fetches a byte while inta_o is high.
 signal vector_counter : integer := 0;
+-- Vector byte to be fed to the CPU in inta cycles
 signal int_vector : std_logic_vector(7 downto 0);
 
 BEGIN
@@ -398,16 +404,14 @@ BEGIN
 		-- Stop the clk process asserting 'done'
 		done <= '1';
 		
-		
  	  assert (done = '1') 
  		report "Test finished."
   	severity failure;
-
 		
 		wait;
 	end process main_test;
 
-  -- RAM access
+  -- (Code) RAM access
   process(clk)
   begin
     if (clk'event and clk='1') then
@@ -418,6 +422,8 @@ BEGIN
     end if;
   end process;
 
+  -- Interrupt vector ROM pointer; update it whenever the CPU fetches a byte
+  -- while in INTA state.
   process(clk)
   begin
     if (clk'event and clk='1') then
@@ -427,10 +433,14 @@ BEGIN
     end if;
   end process;
 
+  -- (Since the vector pointer pre-increments and the ROM in asynchronous, the
+  -- first byte of the ROM is never used).
   int_vector <= int_vectors(vector_counter);
 
   data_i <= data_mem when inta_o='0' else int_vector;
 
+  -- Trigger the IRQ input in a pattern carefully synchronized to the code of 
+  -- the test bench (see 'asm/tb1.asm').
 	int0:
 	process
 	begin
