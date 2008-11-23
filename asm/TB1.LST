@@ -1,0 +1,71 @@
+0001   0000             ;*******************************************************************************
+0002   0000             ; light8080 core test bench 1 -- interrupt & halt test
+0003   0000             ;*******************************************************************************
+0004   0000             ; When used in the test bench vhdl\test\light8080_tb1.vhdl, this program 
+0005   0000             ; should take 410 clock cycles to compplete, ending in halt state.
+0006   0000             ; At that moment, a 033h value in ACC means success and a 0aah  means failure.
+0007   0000             ;*******************************************************************************
+0008   0000             
+0009   0000                     .org    0H
+0010   0000 C3 40 00            jmp     start
+0011   0003                     
+0012   0003                     ; this will be used as interrupt routine
+0013   0020                     .org    20H
+0014   0020 C6 07               adi     7H
+0015   0022 FB                  ei
+0016   0023 C9                  ret
+0017   0024                     
+0018   0024                     ; used as rst test
+0019   0028                     .org    28H
+0020   0028 47                  mov     b,a
+0021   0029 C9                  ret
+0022   002A                             
+0023   0040             start:  .org    40H
+0024   0040 31 06 02            lxi     sp,stack
+0025   0043 FB                  ei
+0026   0044 3E 00               mvi     a,0H      ; a=0, b=?
+0027   0046 EF                  rst     5         ; rst 28h -> a=00h, b=00h 
+0028   0047 C6 01               adi     1H        ; a = 08h (interrupt 1 hits here: a = a + 07h)
+0029   0049 C6 01               adi     1H        ; a = 09h
+0030   004B C6 01               adi     1H        ; a = 0ah
+0031   004D C6 01               adi     1H        ; a = 0bh
+0032   004F C6 01               adi     1H        ; a = 0ch (interrupt 2 hits here: c = 0ch)
+0033   0051 C6 01               adi     1H        ; a = 0dh
+0034   0053 C6 01               adi     1H        ; a = 0eh
+0035   0055 FB                  ei
+0036   0056 C6 01               adi     1H        ; a = 0fh
+0037   0058 C6 01               adi     1H        ; a = 10h
+0038   005A C6 01               adi     1H        ; a = 11h
+0039   005C FB                  ei
+0040   005D 76                  hlt               ; (interrupt 3 hits when in halt: nop )
+0041   005E FE 11               cpi     11h
+0042   0060 C2 7B 00            jnz     fail
+0043   0063 78                  mov     a,b
+0044   0064 FE 00               cpi     0
+0045   0066 C2 7B 00            jnz     fail
+0046   0069 79                  mov     a,c 
+0047   006A FE 0C               cpi     0ch
+0048   006C C2 7B 00            jnz     fail
+0049   006F 7A                  mov     a,d 
+0050   0070 FE 12               cpi     12h
+0051   0072 7B                  mov     a,e 
+0052   0073 FE 34               cpi     34h
+0053   0075 C2 7B 00            jnz     fail
+0054   0078 3E 33               mvi     a,33h      ; success
+0055   007A 76                  hlt
+0056   007B 3E AA       fail:   mvi     a,0aah     ; failure
+0057   007D 76                  hlt        
+0058   007E                     
+0059   007E                     ; this is used to test the call instruction as interrupt vector
+0060   0100                     .org    100H        
+0061   0100 C6 09               adi     9h
+0062   0102 06 77               mvi     b,77h
+0063   0104 FB                  ei
+0064   0105 C9                  ret
+0065   0106                     
+0066   0106                     ; data space
+0067   0206                     .org    $+256
+0068   0206             stack:  .equ    $   
+0069   0206                     .end
+0070   0206                     
+tasm: Number of errors = 0
