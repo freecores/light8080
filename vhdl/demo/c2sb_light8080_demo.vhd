@@ -5,6 +5,9 @@
 -- Runs IMSAI SCS1 monitor on serial port, using 4KB of internal RAM.
 -- Documentation for the monitor and Altera Quartus pin assignment files are 
 -- included.
+--
+-- All that's really needed to run the demo is the serial interface (2 pins),
+-- so this should be easy to adapt to any other dev board.
 --#############################################################################
 
 library IEEE;
@@ -768,7 +771,7 @@ with io_port select
 -- FLASH
 --##############################################################################
 
-
+  -- Flash is unused
 	flash_addr <= "000000000000" & switches;
 	flash_we <= '1';
 	flash_oe <= '1';

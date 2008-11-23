@@ -1,7 +1,7 @@
 --##############################################################################
 -- RS-232 transmitter, hardwired to 9600 bauds when clocked at 50MHz.
 -- WARNING: Hacked up for light8080 demo. Poor performance, no formal testing!
--- I don't advise using this in for any general purpose.
+-- I don't advise using this for any purpose.
 --##############################################################################
 
 
@@ -21,7 +21,6 @@ entity rs232_tx is
 end rs232_tx;
 
 architecture demo of rs232_tx is
-
 
 signal counter : integer;
 
