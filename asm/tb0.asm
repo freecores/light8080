@@ -1,4 +1,25 @@
 ;***********************************************************************
+; tb0.asm : test bench for light8080 core -- Modified Kelly Smith test
+;***********************************************************************
+; This is a version of the Kelly Smith test for 8080 CPUs, adapted for
+; TASM assembler ('Telemark Assembler', aka 'Table Assembler').
+;
+; The code executes from address 0 and takes a little more than 1KB. It
+; uses the area immediately following the code for variables and stack, 
+; so this code should be placed in an 'initialized RAM' block rather 
+; than a ROM.
+; See 'vhdl/light8080_tb0.vhdl' for an example.
+;
+; The resulting HEX file can be transformed into a ROM data block in 
+; VHDL syntax with the supplied 'util/hexconv.pl' script; assuming a ROM
+; size of 2KB this is the command line:
+;   perl hexconv.pl TB0.HEX 0 0x0800
+;
+; The code exercises all instructions except I/O and calls (not at all 
+; exhaustively) and terminates with 0x033 in the accumulator if all the 
+; tests succeed or 0x0aa if any of the tests fail.
+; 
+;***********************************************************************
 ; MICROCOSM ASSOCIATES  8080/8085 CPU DIAGNOSTIC VERSION 1.0  (C) 1980
 ;***********************************************************************
 ;
@@ -21,9 +42,9 @@
 ; Modified 2006/11/16 by Scott Moore to work on CPU8080 FPGA core
 ;
 ;***********************************************************************
-; Modified 2007/09/24 by Jose Ruiz for use in free8080 FPGA core
+; Modified 2008/11/23 by Jose Ruiz for use in free8080 FPGA core
 ;
-; 1.- Changed formatting for compatibility to CP/M's ASM
+; 1.- Changed formatting for compatibility to TASM assembler
 ; 2.- Commented out all Altair / MITS hardware related stuff
 ; 3.- Set origin at 0H
 ; 
@@ -118,7 +139,7 @@
 ;
 ;test jump instructions and flags
 ;
-        org     0H
+        .org    0H
 
 cpu:    lxi     sp,stack ;set the stack pointer
         mvi     a,077H  ;@ initialize A to remove X values from simulation
@@ -476,8 +497,8 @@ movi:   mvi     a,077H
         mvi     c,045H
         mvi     d,046H
         mvi     e,047H
-        mvi     h,(temp0 / 0ffH)        ;high byte of test memory location
-        mvi     l,(temp0 and 0ffH)      ;low byte of test memory location
+        mvi     h,temp0 / 0ffH      ;high byte of test memory location
+        mvi     l,temp0 & 0ffH      ;low byte of test memory location
         mov     m,b
         mvi     b,0H
         mov     b,m
@@ -497,21 +518,21 @@ movi:   mvi     a,077H
         cmp     e
         cnz     cpuer   ;test "mov" m,e and e,m
         mov     m,h
-        mvi     h,(temp0 / 0ffH)
-        mvi     l,(temp0 and 0ffH)
+        mvi     h,temp0 / 0ffH
+        mvi     l,temp0 & 0ffH
         mov     h,m
-        mvi     a,(temp0 / 0ffH)
+        mvi     a,temp0 / 0ffH
         cmp     h
         cnz     cpuer   ;test "mov" m,h and h,m
         mov     m,l
-        mvi     h,(temp0 / 0ffH)
-        mvi     l,(temp0 and 0ffH)
+        mvi     h,temp0 / 0ffH
+        mvi     l,temp0 & 0ffH
         mov     l,m
-        mvi     a,(temp0 and 0ffH)
+        mvi     a,temp0 & 0ffH
         cmp     l
         cnz     cpuer   ;test "mov" m,l and l,m
-        mvi     h,(temp0 / 0ffH)
-        mvi     l,(temp0 and 0ffH)
+        mvi     h,temp0 / 0ffH
+        mvi     l,temp0 & 0ffH
         mvi     a,032H
         mov     m,a
         cmp     m
@@ -523,8 +544,8 @@ movi:   mvi     a,077H
         mov     a,m
         cpi     032H
         cnz     cpuer   ;test "mov" a,m
-        mvi     h,(temp0 / 0ffH)
-        mvi     l,(temp0 and 0ffH)
+        mvi     h,temp0 / 0ffH
+        mvi     l,temp0 & 0ffH
         mov     a,m
         sub     m
         cnz     cpuer   ;test "sub" m
@@ -798,25 +819,33 @@ movi:   mvi     a,077H
 cpuer:  mvi     a, 0aaH ; set exit code (failure)
         hlt             ; stop here
 
-cpuok:  mvi     a, 55H  ;
+cpuok:  mvi     a, 033H ; set exit code (success)
         hlt             ; stop here - no trap
 
 
 ;
 ; Data area in program space
 ;
-tempp:  dw    temp0   ;pointer used to test "lhld","shld",
-                        ; and "ldax" instructions
+tempp:  .dw    temp0   ; pointer used to test "lhld","shld",
+                       ; and "ldax" instructions
 ;
 ; Data area in variable space
 ;
-temp0:  ds   1       ;temporary storage for cpu test memory locations
-temp1:  ds   1       ;temporary storage for cpu test memory locations
-temp2:  ds   1       ;temporary storage for cpu test memory locations
-temp3:  ds   1       ;temporary storage for cpu test memory locations
-temp4:  ds   1       ;temporary storage for cpu test memory locations
-savstk: ds   2       ;temporary stack-pointer storage location
+temp0:  
+        .org $+1     ;temporary storage for cpu test memory locations
+temp1:  
+        .org $+1     ;temporary storage for cpu test memory locations
+temp2:  
+        .org $+1     ;temporary storage for cpu test memory locations
+temp3:  
+        .org $+1     ;temporary storage for cpu test memory locations
+temp4:  
+        .org $+1     ;temporary storage for cpu test memory locations
+savstk: 
+        .org $+2     ;temporary stack-pointer storage location
 
-        ds   256     ;de-bug stack pointer storage area
-stack:  dw   0        
+        .org $+256   ;de-bug stack pointer storage area
+stack:  .dw   0        
 
+        .end
+        

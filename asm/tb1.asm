@@ -1,27 +1,28 @@
 ;*******************************************************************************
-; light8080 core test bench 1
-; interrupt & halt test
+; light8080 core test bench 1 -- interrupt & halt test
 ;*******************************************************************************
 ; When used in the test bench vhdl\test\light8080_tb1.vhdl, this program 
 ; should take 410 clock cycles to compplete, ending in halt state.
-; At that moment, a 055h value in ACC means success and a 0aah  means failure.
+; At that moment, a 033h value in ACC means success and a 0aah  means failure.
+;
+; This should be assembled with TASM (Telemark Assembler).
 ;*******************************************************************************
 
-        org     0H
+        .org    0H
         jmp     start
         
         ; this will be used as interrupt routine
-        org     20H
+        .org    20H
         adi     7H
         ei
         ret
         
         ; used as rst test
-        org     28H
+        .org    28H
         mov     b,a
         ret
                 
-start:  org     40H
+start:  .org    40H
         lxi     sp,stack
         ei
         mvi     a,0H      ; a=0, b=?
@@ -36,9 +37,9 @@ start:  org     40H
         ei
         adi     1H        ; a = 0fh
         adi     1H        ; a = 10h
-        adi     1H        ; a = 11h
+        adi     1H        ; a = 11h (interrupt 3 hits here: hl = 1234h)
         ei
-        hlt               ; (interrupt 3 hits when in halt: nop )
+        hlt               ; (interrupt 4 hits when in halt state: nop )
         cpi     11h
         jnz     fail
         mov     a,b
@@ -52,17 +53,20 @@ start:  org     40H
         mov     a,e 
         cpi     34h
         jnz     fail
-        mvi     a,55h
+        mvi     a,33h      ; success
         hlt
-fail:   mvi     a,0aah
+fail:   mvi     a,0aah     ; failure
         hlt        
         
-        org     100H
+        ; this is used to test the call instruction as interrupt vector
+        .org    100H        
         adi     9h
         mvi     b,77h
         ei
         ret
         
         ; data space
-        ds      256
-stack:  dw      0        
+        .org    $+256
+stack:  .equ    $   
+        .end
+        
