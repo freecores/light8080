@@ -4,9 +4,10 @@
 -- v1.1    (20 sep 2008) Microcode bug in INR fixed.
 -- v1.0    (05 nov 2007) First release. Jose A. Ruiz.
 --
--- This file and all the light8080 project are freeware (See COPYING.TXT)
+-- This file and all the light8080 project files are freeware (See COPYING.TXT)
 --##############################################################################
--- -- (More comprehensive explainations can be found in the design notes)
+-- (See timing diagrams at bottom of file. More comprehensive explainations can 
+-- be found in the design notes)
 --##############################################################################
 
 library IEEE;
@@ -28,8 +29,9 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 -- inta :     interrupt acknowledge
 -- reset :    synchronous reset
 -- clk :      clock
+--
+-- (see timing diagrams at bottom of file)
 --##############################################################################
-
 entity light8080 is
     Port (  
             addr_out :  out std_logic_vector(15 downto 0);
@@ -43,6 +45,7 @@ entity light8080 is
             io :        out std_logic;
             rd :        out std_logic;
             wr :        out std_logic;
+            fetch :     out std_logic;
             data_in :   in std_logic_vector(7 downto 0);  
             data_out :  out std_logic_vector(7 downto 0);
 
@@ -825,6 +828,9 @@ uc_do_jmp <= uc_jsr or (uc_tjsr and condition_reg);
 
 vma <= load_addr;  -- addr is valid, either for memmory or io
 
+-- assume the only uinst that does memory access in the range 0..f is 'fetch'
+fetch <= '1' when uc_addr(7 downto 4)=X"0" and load_addr='1' else '0';
+
 -- external bus interface control signals
 io <= '1' when uc_flags1="100" else '0'; -- IO access (vs. memory)
 rd <= '1' when uc_flags2="101" else '0'; -- RD access
@@ -940,7 +946,7 @@ begin
     if reset = '1' then
       int_pending <= '0';
     else 
-      if intr = '1' and inte_reg = '1' then
+      if intr = '1' and inte_reg = '1' and int_pending = '0' then
         int_pending <= '1';
       else 
         if inte_reg = '1' and uc_end='1' then
@@ -1311,3 +1317,33 @@ addr_out <= rbank_data & addr_low;
 data_out <= DO;
 
 end microcoded;
+
+--------------------------------------------------------------------------------
+-- Timing diagram 1: RD and WR cycles
+--------------------------------------------------------------------------------
+--            1     2     3     4     5     6     7     8     
+--             __    __    __    __    __    __    __    __   
+-- clk      __/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__
+--
+-- addr_o   xxxxxxxxxxxxxx< ADR >xxxxxxxxxxx< ADR >xxxxxxxxxxx
+--
+-- data_i   xxxxxxxxxxxxxxxxxxxx< Din >xxxxxxxxxxxxxxxxxxxxxxx
+--
+-- data_o   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx< Dout>xxxxxxxxxxx
+--                         _____             _____
+-- vma_o    ______________/     \___________/     \___________
+--                         _____
+-- rd_o     ______________/     \_____________________________
+--                                           _____
+-- wr_o     ________________________________/     \___________
+--
+-- (functional diagram, actual time delays not shown)
+--------------------------------------------------------------------------------
+-- This diagram shows a read cycle and a write cycle back to back.
+-- In clock edges (4) and (7), the address is loaded into the external 
+-- synchronous RAM address register. 
+-- In clock edge (5), read data is loaded into the CPU.
+-- In clock edge (7), write data is loaded into the external synchronous RAM.
+-- In actual operation, the CPU does about 1 rd/wr cycle for each 5 clock 
+-- cycles, which is a waste of RAM bandwidth.
+--
