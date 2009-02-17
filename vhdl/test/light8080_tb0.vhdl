@@ -1,79 +1,111 @@
 --------------------------------------------------------------------------------
--- Light8080 simulation test bench 0 : Kelly Smith test
+-- Generated from template tb_template.vhdl by hexconv.pl
 --------------------------------------------------------------------------------
--- This test executes the 'Kelly Smith test' which tests most instructions
--- and flags. At the end of the test, A will contain 0x33 on success or 0x0aa
--- on failure, and the cpu will halt.
--- Interrupts and i/o instructions are not tested.
+-- Light8080 simulation test bench.
+--------------------------------------------------------------------------------
+-- Source for the 8080 program is in asm\tb0.asm
+-------------------------------------------------------------------------------- 
+-- 
+-- This test bench provides a simulated CPU system to test programs. This test 
+-- bench does not do any assertions or checks, all assertions are left to the 
+-- software.
+--
+-- The simulated environment has 2KB of RAM, mirror-mapped to all the memory 
+-- map of the 8080, initialized with the test program object code. See the perl
+-- script 'util\hexconv.pl' and BAT files in the asm directory.
+--
+-- Besides, it provides some means to trigger hardware irq from software, 
+-- including the specification of the instructions fed to the CPU as interrupt
+-- vectors during inta cycles.
+--
+-- We will simulate 8 possible irq sources. The software can trigger any one of 
+-- them by writing at registers 0x010 and 0x011. Register 0x010 holds the irq
+-- source to be triggered (0 to 7) and register 0x011 holds the number of clock
+-- cycles that will elapse from the end of the instruction that writes to the
+-- register to the assertion of intr. 
+--
+-- When the interrupt is acknowledged and inta is asserted, the test bench reads
+-- the value at register 0x010 as the irq source, and feeds an instruction to 
+-- the CPU starting from the RAM address 0040h+source*4.
+-- That is, address range 0040h-005fh is reserved for the simulated 'interrupt
+-- vectors', a total of 4 bytes for each of the 8 sources. This allows the 
+-- software to easily test different interrupt vectors without any hand 
+-- assembly. All of this is strictly simulation-only stuff.
+--
+--
+-- Upon completion, the software must write a value to register 0x020. Writing 
+-- a 0x055 means 'success', writing a 0x0aa means 'failure'. Success and 
+-- failure conditions are defined by the software.
 --------------------------------------------------------------------------------
 
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
-USE ieee.std_logic_unsigned.all;
-USE ieee.numeric_std.ALL;
+library ieee;
+use ieee.std_logic_1164.ALL;
+use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.ALL;
 
-ENTITY light8080_tb0 IS
-END light8080_tb0;
+entity light8080_tb0 is
+end entity light8080_tb0;
 
-ARCHITECTURE behavior OF light8080_tb0 IS 
+architecture behavior of light8080_tb0 is
 
 --------------------------------------------------------------------------------
 -- Simulation parameters
 
--- sim_length: total simulation time
-constant sim_length : time := 700000 ns;
-
--- T: simulation clock period
+-- T: simulated clock period
 constant T : time := 100 ns;
+
+-- MAX_SIM_LENGTH: maximum simulation time
+constant MAX_SIM_LENGTH : time := T*7000; -- enough for the tb0
+
 
 --------------------------------------------------------------------------------
 
 	-- Component Declaration for the Unit Under Test (UUT)
-	COMPONENT light8080
-    PORT (  
-            addr_out :  out std_logic_vector(15 downto 0);
+component light8080
+  port (  
+    addr_out :  out std_logic_vector(15 downto 0);
+    
+    inta :      out std_logic;
+    inte :      out std_logic;
+    halt :      out std_logic;                
+    intr :      in std_logic;
+      
+    vma :       out std_logic;
+    io :        out std_logic;
+    rd :        out std_logic;
+    wr :        out std_logic;
+    fetch :     out std_logic;
+    data_in :   in std_logic_vector(7 downto 0);  
+    data_out :  out std_logic_vector(7 downto 0);
+    
+    clk :       in std_logic;
+    reset :     in std_logic );
+end component;
 
-            inta :      out std_logic;
-            inte :      out std_logic;
-            halt :      out std_logic;                
-            intr :      in std_logic;
-              
-            vma :       out std_logic;
-            io :        out std_logic;
-            rd :        out std_logic;
-            wr :        out std_logic;
-            data_in :   in std_logic_vector(7 downto 0);  
-            data_out :  out std_logic_vector(7 downto 0);
 
-            clk :       in std_logic;
-            reset :     in std_logic );
-	END COMPONENT;
-
-	--Inputs
-	SIGNAL intr_o :  std_logic := '0';
-	SIGNAL data_i :  std_logic_vector(7 downto 0) := (others=>'0');
-
-	--Outputs
-	SIGNAL vma_o  :  std_logic;
-	SIGNAL rd_o  :  std_logic;
-	SIGNAL wr_o  :  std_logic;
-	SIGNAL io_o  :  std_logic;
-  SIGNAL data_o :  std_logic_vector(7 downto 0);
-	SIGNAL addr_o :  std_logic_vector(15 downto 0);
-
-signal inta_o : std_logic;
-signal inte_o : std_logic;
-signal intr_i : std_logic := '0';
-signal halt_o : std_logic;
-
-signal reset    : std_logic := '0';
-signal clk      : std_logic := '1';
-signal done     : std_logic := '0';
+signal data_i :           std_logic_vector(7 downto 0) := (others=>'0');
+signal vma_o  :           std_logic;
+signal rd_o :             std_logic;
+signal wr_o :             std_logic;
+signal io_o :             std_logic;
+signal data_o :           std_logic_vector(7 downto 0);
+signal data_mem :         std_logic_vector(7 downto 0);
+signal addr_o :           std_logic_vector(15 downto 0);
+signal fetch_o :          std_logic;
+signal inta_o :           std_logic;
+signal inte_o :           std_logic;
+signal intr_i :           std_logic := '0';
+signal halt_o :           std_logic;
+                          
+signal reset :            std_logic := '0';
+signal clk :              std_logic := '1';
+signal done :             std_logic := '0';
 
 type t_rom is array(0 to 2047) of std_logic_vector(7 downto 0);
 
 signal rom : t_rom := (
-X"31",X"ef",X"05",X"3e",X"77",X"e6",X"00",X"ca",
+
+X"31",X"f3",X"05",X"3e",X"77",X"e6",X"00",X"ca",
 X"0d",X"00",X"cd",X"e0",X"04",X"d2",X"13",X"00",
 X"cd",X"e0",X"04",X"ea",X"19",X"00",X"cd",X"e0",
 X"04",X"f2",X"1f",X"00",X"cd",X"e0",X"04",X"c2",
@@ -151,18 +183,18 @@ X"b5",X"b7",X"fe",X"3f",X"c4",X"e0",X"04",X"3e",
 X"00",X"26",X"8f",X"2e",X"4f",X"a8",X"a9",X"aa",
 X"ab",X"ac",X"ad",X"fe",X"cf",X"c4",X"e0",X"04",
 X"af",X"c4",X"e0",X"04",X"06",X"44",X"0e",X"45",
-X"16",X"46",X"1e",X"47",X"26",X"04",X"2e",X"e8",
+X"16",X"46",X"1e",X"47",X"26",X"04",X"2e",X"ec",
 X"70",X"06",X"00",X"46",X"3e",X"44",X"b8",X"c4",
 X"e0",X"04",X"72",X"16",X"00",X"56",X"3e",X"46",
 X"ba",X"c4",X"e0",X"04",X"73",X"1e",X"00",X"5e",
 X"3e",X"47",X"bb",X"c4",X"e0",X"04",X"74",X"26",
-X"04",X"2e",X"e8",X"66",X"3e",X"04",X"bc",X"c4",
-X"e0",X"04",X"75",X"26",X"04",X"2e",X"e8",X"6e",
-X"3e",X"e8",X"bd",X"c4",X"e0",X"04",X"26",X"04",
-X"2e",X"e8",X"3e",X"32",X"77",X"be",X"c4",X"e0",
+X"04",X"2e",X"ec",X"66",X"3e",X"04",X"bc",X"c4",
+X"e0",X"04",X"75",X"26",X"04",X"2e",X"ec",X"6e",
+X"3e",X"ec",X"bd",X"c4",X"e0",X"04",X"26",X"04",
+X"2e",X"ec",X"3e",X"32",X"77",X"be",X"c4",X"e0",
 X"04",X"86",X"fe",X"64",X"c4",X"e0",X"04",X"af",
 X"7e",X"fe",X"32",X"c4",X"e0",X"04",X"26",X"04",
-X"2e",X"e8",X"7e",X"96",X"c4",X"e0",X"04",X"3e",
+X"2e",X"ec",X"7e",X"96",X"c4",X"e0",X"04",X"3e",
 X"80",X"87",X"8e",X"fe",X"33",X"c4",X"e0",X"04",
 X"3e",X"80",X"87",X"9e",X"fe",X"cd",X"c4",X"e0",
 X"04",X"a6",X"c4",X"e0",X"04",X"3e",X"25",X"b6",
@@ -177,19 +209,19 @@ X"04",X"bd",X"c4",X"e0",X"04",X"0b",X"1b",X"2b",
 X"3e",X"12",X"b8",X"c4",X"e0",X"04",X"ba",X"c4",
 X"e0",X"04",X"bc",X"c4",X"e0",X"04",X"3e",X"ff",
 X"b9",X"c4",X"e0",X"04",X"bb",X"c4",X"e0",X"04",
-X"bd",X"c4",X"e0",X"04",X"32",X"e8",X"04",X"af",
-X"3a",X"e8",X"04",X"fe",X"ff",X"c4",X"e0",X"04",
-X"2a",X"e6",X"04",X"22",X"e8",X"04",X"3a",X"e6",
-X"04",X"47",X"3a",X"e8",X"04",X"b8",X"c4",X"e0",
-X"04",X"3a",X"e7",X"04",X"47",X"3a",X"e9",X"04",
-X"b8",X"c4",X"e0",X"04",X"3e",X"aa",X"32",X"e8",
+X"bd",X"c4",X"e0",X"04",X"32",X"ec",X"04",X"af",
+X"3a",X"ec",X"04",X"fe",X"ff",X"c4",X"e0",X"04",
+X"2a",X"ea",X"04",X"22",X"ec",X"04",X"3a",X"ea",
+X"04",X"47",X"3a",X"ec",X"04",X"b8",X"c4",X"e0",
+X"04",X"3a",X"eb",X"04",X"47",X"3a",X"ed",X"04",
+X"b8",X"c4",X"e0",X"04",X"3e",X"aa",X"32",X"ec",
 X"04",X"44",X"4d",X"af",X"0a",X"fe",X"aa",X"c4",
-X"e0",X"04",X"3c",X"02",X"3a",X"e8",X"04",X"fe",
-X"ab",X"c4",X"e0",X"04",X"3e",X"77",X"32",X"e8",
-X"04",X"2a",X"e6",X"04",X"11",X"00",X"00",X"eb",
+X"e0",X"04",X"3c",X"02",X"3a",X"ec",X"04",X"fe",
+X"ab",X"c4",X"e0",X"04",X"3e",X"77",X"32",X"ec",
+X"04",X"2a",X"ea",X"04",X"11",X"00",X"00",X"eb",
 X"af",X"1a",X"fe",X"77",X"c4",X"e0",X"04",X"af",
 X"84",X"85",X"c4",X"e0",X"04",X"3e",X"cc",X"12",
-X"3a",X"e8",X"04",X"fe",X"cc",X"12",X"3a",X"e8",
+X"3a",X"ec",X"04",X"fe",X"cc",X"12",X"3a",X"ec",
 X"04",X"fe",X"cc",X"c4",X"e0",X"04",X"21",X"77",
 X"77",X"29",X"3e",X"ee",X"bc",X"c4",X"e0",X"04",
 X"bd",X"c4",X"e0",X"04",X"21",X"55",X"55",X"01",
@@ -219,18 +251,18 @@ X"e0",X"04",X"3e",X"12",X"b8",X"c4",X"e0",X"04",
 X"3e",X"34",X"b9",X"c4",X"e0",X"04",X"3e",X"aa",
 X"ba",X"c4",X"e0",X"04",X"bb",X"c4",X"e0",X"04",
 X"3e",X"55",X"bc",X"c4",X"e0",X"04",X"bd",X"c4",
-X"e0",X"04",X"21",X"00",X"00",X"39",X"22",X"ed",
-X"04",X"31",X"ec",X"04",X"3b",X"3b",X"33",X"3b",
-X"3e",X"55",X"32",X"ea",X"04",X"2f",X"32",X"eb",
+X"e0",X"04",X"21",X"00",X"00",X"39",X"22",X"f1",
+X"04",X"31",X"f0",X"04",X"3b",X"3b",X"33",X"3b",
+X"3e",X"55",X"32",X"ee",X"04",X"2f",X"32",X"ef",
 X"04",X"c1",X"b8",X"c4",X"e0",X"04",X"2f",X"b9",
-X"c4",X"e0",X"04",X"21",X"ec",X"04",X"f9",X"21",
-X"33",X"77",X"3b",X"3b",X"e3",X"3a",X"eb",X"04",
-X"fe",X"77",X"c4",X"e0",X"04",X"3a",X"ea",X"04",
+X"c4",X"e0",X"04",X"21",X"f0",X"04",X"f9",X"21",
+X"33",X"77",X"3b",X"3b",X"e3",X"3a",X"ef",X"04",
+X"fe",X"77",X"c4",X"e0",X"04",X"3a",X"ee",X"04",
 X"fe",X"33",X"c4",X"e0",X"04",X"3e",X"55",X"bd",
 X"c4",X"e0",X"04",X"2f",X"bc",X"c4",X"e0",X"04",
-X"2a",X"ed",X"04",X"f9",X"21",X"e3",X"04",X"e9",
-X"3e",X"aa",X"76",X"3e",X"33",X"76",X"e8",X"04",
-X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00",
+X"2a",X"f1",X"04",X"f9",X"21",X"e5",X"04",X"e9",
+X"3e",X"aa",X"d3",X"20",X"76",X"3e",X"55",X"d3",
+X"20",X"76",X"ec",X"04",X"00",X"00",X"00",X"00",
 X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00",
 X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00",
 X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00",
@@ -332,8 +364,13 @@ X"00",X"00",X"00",X"00",X"00",X"00",X"00",X"00"
 
 );
 
+signal irq_vector_byte:   std_logic_vector(7 downto 0);
+signal irq_source :       integer range 0 to 7;
+signal cycles_to_intr :   integer range -10 to 255;
+signal int_vector_index : integer range 0 to 3;
+signal addr_vector_table: integer range 0 to 65535;
 
-BEGIN
+begin
 
 	-- Instantiate the Unit Under Test (UUT)
 	uut: light8080 PORT MAP(
@@ -343,6 +380,7 @@ BEGIN
 		rd => rd_o,
 		wr => wr_o,
 		io => io_o,
+		fetch => fetch_o,
 		addr_out => addr_o, 
 		data_in => data_i,
 		data_out => data_o,
@@ -354,45 +392,130 @@ BEGIN
 	);
 
 
-  ---------------------------------------------------------------------------
-	-- clock: Clocking process.
-	clock:
-	process(done, clk)
-	begin
-		if done = '0' then
-			clk <= not clk after T/2;
-		end if;
-	end process clock;
+-- clock: run clock until test is done
+clock:
+process(done, clk)
+begin
+	if done = '0' then
+		clk <= not clk after T/2;
+	end if;
+end process clock;
 
 
-  main_test:
-	process
-	begin
-		-- Assert reset for at least one full clk period
-		reset <= '1';
-		wait until clk = '1';
-		wait for T/2;
-		reset <= '0';
+-- Drive reset and done 
+main_test:
+process
+begin
+	-- Assert reset for at least one full clk period
+	reset <= '1';
+	wait until clk = '1';
+	wait for T/2;
+	reset <= '0';
 
-		-- Remember to 'cut away' the preceding 3 clk semiperiods from 
-		-- the wait statement...
-		wait for (sim_length - T*1.5);
+	-- Remember to 'cut away' the preceding 3 clk semiperiods from 
+	-- the wait statement...
+	wait for (MAX_SIM_LENGTH - T*1.5);
 
-		-- Stop the clk process asserting 'done'
-		done <= '1';
-		wait;
-	end process main_test;
+	-- Maximum sim time elapsed, assume the program ran away and
+	-- stop the clk process asserting 'done' (which will stop the simulation)
+	done <= '1';
+	
+  assert (done = '1') 
+	report "Test timed out."
+	severity failure;
+	
+	wait;
+end process main_test;
 
 
-  process(clk)
-  begin
-    if (clk'event and clk='1') then
-      data_i <= rom(conv_integer(addr_o(10 downto 0)));
-      if wr_o = '1' then
-        rom(conv_integer(addr_o(10 downto 0))) <= data_o;
-      end if;  
+-- Synchronous RAM; 2KB mirrored everywhere
+synchronous_ram:
+process(clk)
+begin
+  if (clk'event and clk='1') then
+    data_mem <= rom(conv_integer(addr_o(10 downto 0)));
+    if wr_o = '1' and addr_o(15 downto 11)="00000" then
+      rom(conv_integer(addr_o(10 downto 0))) <= data_o;
+    end if;  
+  end if;
+end process synchronous_ram;
+
+
+irq_trigger_register:
+process(clk)
+begin
+  if (clk'event and clk='1') then
+    if reset='1' then
+      cycles_to_intr <= -10; -- meaning no interrupt pending
+      intr_i <= '0';
+    else
+      if io_o='1' and wr_o='1' and addr_o(7 downto 0)=X"11" then
+        cycles_to_intr <= conv_integer(data_o) + 1;
+      else
+        if cycles_to_intr >= 0 then
+          cycles_to_intr <= cycles_to_intr - 1;
+        end if;
+        if cycles_to_intr = 0 then
+          intr_i <= '1';
+        else
+          intr_i <= '0';
+        end if;
+      end if;
     end if;
-  end process;
+  end if;
+end process irq_trigger_register;
 
 
-END;
+irq_source_register:
+process(clk)
+begin
+  if (clk'event and clk='1') then
+    if reset='1' then
+      irq_source <= 0;
+    else
+      if io_o='1' and wr_o='1' and addr_o(7 downto 0)=X"10" then
+        irq_source <= conv_integer(data_o(2 downto 0));
+      end if;
+    end if;
+  end if;
+end process irq_source_register;
+
+
+-- 'interrupt vector' logic.
+irq_vector_table:
+process(clk)
+begin
+  if (clk'event and clk='1') then
+    if vma_o = '1' and rd_o='1' then
+      if inta_o = '1' then
+        int_vector_index <= int_vector_index + 1;
+      else
+        int_vector_index <= 0;
+      end if;
+    end if;
+    -- this is the address of the byte we'll feed to the CPU
+    addr_vector_table <= 64+irq_source*4+int_vector_index;
+  end if;
+end process irq_vector_table;
+irq_vector_byte <= rom(addr_vector_table);
+
+data_i <= data_mem when inta_o='0' else irq_vector_byte;
+
+
+test_outcome_register:
+process(clk)
+variable outcome : std_logic_vector(7 downto 0);
+begin
+  if (clk'event and clk='1') then
+    if io_o='1' and wr_o='1' and addr_o(7 downto 0)=X"20" then
+    assert (data_o /= X"55") report "Software reports SUCCESS" severity failure;
+    assert (data_o /= X"aa") report "Software reports FAILURE" severity failure;
+    assert ((data_o = X"aa") or (data_o = X"55")) 
+    report "Software reports unexpected outcome value." 
+    severity failure;
+    end if;
+  end if;
+end process test_outcome_register;
+
+
+end;
